@@ -9,6 +9,24 @@ a local MariaDB server can be run using docker by running the following command:
 ```sh
 docker run -it --detach	--name mariadb --env MARIADB_ROOT_PASSWORD=1234	-p 3306:3306 mariadb:latest
 ```
+The server expects a database named `nft` with a table created using the following query:
+```sql
+    CREATE TABLE `events` (
+        `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'Record ID. No touchy.',
+        `token` BIGINT(20) NOT NULL DEFAULT '0' COMMENT 'Token IDs are 16 byte wide, but are generated sequentially. Realistically there won\'t be that many ShyTokens minted.',
+        `eventType` ENUM('TokenMinted','TokenGiven','TokenDestroyed','other') NOT NULL DEFAULT 'other' COLLATE 'utf8mb4_uca1400_ai_ci',
+        `previousOwner` CHAR(40) NOT NULL DEFAULT '0' COMMENT 'hex-encoded address of (new) owner withouth \'0x\' prefix.' COLLATE 'utf8mb4_uca1400_ai_ci',
+        `newOwner` CHAR(40) NOT NULL DEFAULT '0' COMMENT 'hex-encoded address of (new) owner withouth \'0x\' prefix.' COLLATE 'utf8mb4_uca1400_ai_ci',
+        `metadata` LONGTEXT NULL DEFAULT NULL COMMENT 'Optional metadata.' COLLATE 'utf8mb4_bin',
+        PRIMARY KEY (`id`) USING BTREE,
+        CONSTRAINT `metadata` CHECK (json_valid(`metadata`))
+    )
+    COMMENT='Shranjevanje podatkov v bazo\r\no Shrani osnovne podatke o NFT-jih (kot so ID, naslov lastnika in metapodatki)\r\nv izbrano bazo (MongoDB, Postgres ali katerokoli drugo).\r\no Če naletiš na težave pri povezavi z bazo ali pa vzame prevec casa, lahko\r\nnapises zgolj kodo, ki prikazuje logiko shranjevanja brez izvedbe.'
+    COLLATE='utf8mb4_uca1400_ai_ci'
+    ENGINE=InnoDB
+    AUTO_INCREMENT=0
+;
+```
 
 ### troubleshooting:
 If you encounter the following notice:
