@@ -1,4 +1,3 @@
-// ethersSetup.ts
 import { ethers } from 'ethers';
 import nftAbi from './shyTokenAbi.js';
 import mariadb from 'mariadb';
@@ -19,7 +18,7 @@ const dbConnection = await pool.getConnection();
 const provider = new ethers.InfuraProvider('sepolia', process.env.INFURA_API_KEY);
 const contractAddress = process.env.CONTRACT_ADDRESS;
 if (contractAddress === undefined)
-    throw "undefined CONTRACT_ADDRESS"
+    throw "undefined CONTRACT_ADDRESS in env."
 
 const contract = new ethers.Contract(contractAddress, nftAbi, provider);
 const processedTxs = new Set<string>();
